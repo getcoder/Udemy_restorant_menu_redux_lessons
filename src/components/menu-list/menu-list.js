@@ -1,19 +1,68 @@
-import React, {Component} from 'react';
-import MenuListItem from '../menu-list-item';
+import React, { useEffect } from "react";
+import MenuListItem from "../menu-list-item/menu-list-item";
+import { connect } from "react-redux";
+import WithRestoService from "../hoc/with-resto-service";
+import { menuLoaded, menuRequsted, menuError, addToCart } from "../../actions";
+import Spinner from "../spinner/spinner";
+import Error from "../error/error";
 
-import './menu-list.scss';
+import "./menu-list.scss";
 
-class MenuList extends Component {
+const MenuList = ({
+  menuItems,
+  menuLoaded,
+  menuError,
+  menuRequsted,
+  RestoService,
+  loading,
+  error,
+  addToCart,
+}) => {
+  useEffect(() => {
+    menuRequsted();
+    RestoService.getMenuItems()
+      .then((res) => menuLoaded(res))
+      .catch((err) => menuError());
+  }, []);
 
-    render() {
+  if (loading) {
+    return <Spinner />;
+  }
 
+  if (error) {
+    return <Error />;
+  }
+
+  return (
+    <ul className="menu__list">
+      {menuItems.map((item) => {
         return (
-            <ul className="menu__list">
-                <MenuListItem/>
-            </ul>
-        )
-    }
+          <MenuListItem
+            key={item.id}
+            menuItem={item}
+            onAddToCart={() => addToCart(item.id)}
+          />
+        );
+      })}
+    </ul>
+  );
 };
 
+const mapStateToProps = (state) => {
+  return {
+    menuItems: state.menu,
+    loading: state.loading,
+    error: state.error,
+  };
+};
 
-export default MenuList;
+const mapDispatchToProps = {
+  menuLoaded,
+  menuRequsted,
+  menuError,
+  addToCart,
+};
+
+export default WithRestoService(
+  connect(mapStateToProps, mapDispatchToProps)(MenuList)
+);
