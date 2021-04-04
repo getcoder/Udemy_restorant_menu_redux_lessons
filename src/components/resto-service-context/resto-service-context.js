@@ -1,5 +1,15 @@
 import React from "react";
+import RestoService from "../../services/resto-service";
 
-const RestoServiceContext = React.createContext();
+export const ServiceContext = React.createContext();
+
+const RestoServiceContext = ({ children }) => {
+  const restoService = new RestoService();
+  return (
+    <ServiceContext.Provider value={restoService}>
+      {children}
+    </ServiceContext.Provider>
+  );
+};
 
 export default RestoServiceContext;

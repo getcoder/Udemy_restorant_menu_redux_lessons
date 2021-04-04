@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import MenuListItem from "../menu-list-item/menu-list-item";
 import { connect } from "react-redux";
-import WithRestoService from "../hoc/with-resto-service";
 import { menuLoaded, menuRequsted, menuError, addToCart } from "../../actions";
 import Spinner from "../spinner/spinner";
 import Error from "../error/error";
+import { ServiceContext } from "../resto-service-context/resto-service-context";
 
 import "./menu-list.scss";
 
@@ -13,11 +13,12 @@ const MenuList = ({
   menuLoaded,
   menuError,
   menuRequsted,
-  RestoService,
   loading,
   error,
   addToCart,
 }) => {
+  const RestoService = useContext(ServiceContext);
+
   useEffect(() => {
     menuRequsted();
     RestoService.getMenuItems()
@@ -63,6 +64,4 @@ const mapDispatchToProps = {
   addToCart,
 };
 
-export default WithRestoService(
-  connect(mapStateToProps, mapDispatchToProps)(MenuList)
-);
+export default connect(mapStateToProps, mapDispatchToProps)(MenuList);
